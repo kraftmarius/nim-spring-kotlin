@@ -12,9 +12,9 @@ lint:
 fix:
     ktlint -F "src/**/*.kt"
 
-# Run test suite
-test:
-    ./gradlew test
+# Run test suite (accepts additional Gradle args, e.g. `just test --rerun`)
+test *args:
+    ./gradlew test {{args}}
 
 # Start application locally
 run:
