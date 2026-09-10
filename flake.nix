@@ -1,5 +1,5 @@
 {
-  description = "Misère Nim Game API - Isolated Dev Environment";
+  description = "Nim Game API (Kotlin + Spring Boot) - Isolated Dev Environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

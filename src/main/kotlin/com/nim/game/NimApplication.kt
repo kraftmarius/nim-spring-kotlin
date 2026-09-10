@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class MisereNimApplication
+class NimApplication
 
 fun main(args: Array<String>) {
-    runApplication<MisereNimApplication>(*args)
+    runApplication<NimApplication>(*args)
 }

@@ -1,12 +1,12 @@
-# Misère Nim Game API — Design & Specification
+# Nim Game API — Design & Specification
 
-A RESTful API design for the single-heap **Misère Nim** game, to be built with **Kotlin** and **Spring Boot**.
+A RESTful API for the single-heap **Nim** game, supporting both the **normal** and **misère** variants, built with **Kotlin** and **Spring Boot**.
 
 ---
 
 ## Game Theory & Specification
 
-The system will implement the subtraction game variant of Misère Nim:
+The system implements the single-heap subtraction game **Nim**. The **misère** variant is specified below (the normal variant will be added):
 - **Rules:** The game is played with a single heap of matches. Two players (Human vs. Computer) take turns removing **1, 2, or 3 matches**.
 - **Misère Condition:** The player forced to take the **last match loses**.
 
@@ -64,8 +64,8 @@ curl https://start.spring.io/starter.tgz \
   -d bootVersion=4.1.1 \
   -d baseDir=. \
   -d groupId=com.nim \
-  -d artifactId=misere-nim \
-  -d name=misere-nim \
+  -d artifactId=nim-spring-kotlin \
+  -d name=nim-spring-kotlin \
   -d packageName=com.nim.game \
   -d javaVersion=25 \
   -d dependencies=web,validation \

@@ -1,1 +1,1 @@
-rootProject.name = "misere-nim"
+rootProject.name = "nim-spring-kotlin"
