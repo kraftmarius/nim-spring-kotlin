@@ -1,13 +1,14 @@
 # Nim Game API — Design & Specification
 
-A RESTful API for the single-heap **Nim** game, supporting both the **normal** and **misère** variants, built with **Kotlin** and **Spring Boot**.
+A RESTful API for the **Nim** game, supporting both the **normal** and **misère** variants across one or more heaps, built with **Kotlin** and **Spring Boot**.
 
 ---
 
 ## Game Theory & Specification
 
-The system implements the single-heap subtraction game **Nim**. The **misère** variant is specified below (the normal variant will be added):
-- **Rules:** The game is played with a single heap of matches. Two players (Human vs. Computer) take turns removing **1, 2, or 3 matches**.
+The system implements the subtraction game **Nim** across one or more heaps, with both the **normal** and **misère** variants:
+- **Rules:** Two players (Human vs. Computer) take turns removing matches from a single heap per turn. The take range is configurable via `GameRules` (default: **1–3**).
+- **Normal Condition:** The player who takes the **last match wins**.
 - **Misère Condition:** The player forced to take the **last match loses**.
 
 ---
@@ -46,10 +47,16 @@ Build and development tasks are managed via [`just`](https://github.com/casey/ju
 | `just list` | List all available recipes |
 | `just lint` | Check code style and formatting without modifying files |
 | `just fix` | Automatically format code and apply safe style fixes in-place |
-| `just test` | Run the test suite |
+| `just test [args]` | Run the test suite (forwards extra Gradle args, e.g. `just test --rerun`) |
 | `just run` | Start the application locally |
 | `just clean` | Clean build artifacts |
 | `just check` | Complete verification: lint check followed by tests |
+
+---
+
+## Testing
+
+The domain layer (`com.nim.game.domain`) is covered by a JUnit 5 unit test suite exercising `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, and `Player` turn alternation. Gradle is configured to log `PASSED` / `SKIPPED` / `FAILED` events with full exception traces. Run the suite via `just test` (or `just check` for lint + tests).
 
 ---
 
