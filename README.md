@@ -2,25 +2,26 @@
 
 A RESTful API for the **Nim** game, supporting both the **normal** and **misère** variants across one or more heaps, built with **Kotlin** and **Spring Boot**.
 
----
+______________________________________________________________________
 
 ## Game Theory & Specification
 
 The system implements the subtraction game **Nim** across one or more heaps, with both the **normal** and **misère** variants:
+
 - **Rules:** Two players (Human vs. Computer) take turns removing matches from a single heap per turn. The take range is configurable via `GameRules` (default: **1–3**).
 - **Normal Condition:** The player who takes the **last match wins**.
 - **Misère Condition:** The player forced to take the **last match loses**.
 
----
+______________________________________________________________________
 
 ## Technical Stack & Architectural Decisions
 
-- **Kotlin & JVM 25 (LTS):** Chosen for modern language ergonomics (immutability, data classes, null safety) on the latest LTS runtime.
+- **Kotlin & JVM 25 (LTS):** Chosen for modern language ergonomics (immutability, data classes, null safety) on the LTS runtime.
 - **Spring Boot 4.1.1:** Latest release track, avoiding milestones or unstable snapshots.
 - **Minimal Dependencies:** Core framework starters limited to `org.springframework.boot:spring-boot-starter-webmvc` and `org.springframework.boot:spring-boot-starter-validation`. `kotlin-reflect` and `jackson-module-kotlin` are included for Kotlin serialization support.
-- **Dev Environment Isolation (NixOS / Flakes):** The project includes a `flake.nix` providing JDK 25, `curl`, `just`, and `ktlint`. Gradle caches are scoped strictly to `.gradle-home/` to ensure zero pollution of the host environment.
+- **Dev Environment Isolation (NixOS / Flakes):** The project includes a `flake.nix` providing JDK 25, `just`, and `ktlint`. Gradle caches are scoped strictly to `.gradle-home/` to ensure zero pollution of the host environment.
 
----
+______________________________________________________________________
 
 ## Prerequisites
 
@@ -32,11 +33,14 @@ The system implements the subtraction game **Nim** across one or more heaps, wit
 
 > **Gradle** is not required — the project ships a Gradle wrapper (`./gradlew`).
 
-**Nix users:** Enter the development shell via `nix develop`. The `flake.nix` provisions all of the above automatically.
+**Nix users:** The `flake.nix` provisions all of the above automatically.
+
+- **With [`direnv`](https://direnv.net) (recommended):** Run `direnv allow` once, and the `.envrc` auto-activates the dev shell (via `use flake`) whenever you `cd` into the project. Any `.env` / `.env.local` file is also loaded.
+- **Without direnv:** Enter the shell manually via `nix develop`.
 
 **Non-Nix users:** Install the tools independently. The JDK must be available on `$JAVA_HOME` or `$PATH` for the Gradle wrapper to resolve the toolchain.
 
----
+______________________________________________________________________
 
 ## Available Commands
 
@@ -52,13 +56,13 @@ Build and development tasks are managed via [`just`](https://github.com/casey/ju
 | `just clean` | Clean build artifacts |
 | `just check` | Complete verification: lint check followed by tests |
 
----
+______________________________________________________________________
 
 ## Testing
 
 The domain layer (`com.nim.game.domain`) is covered by a JUnit 5 unit test suite exercising `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, and `Player` turn alternation. Gradle is configured to log `PASSED` / `SKIPPED` / `FAILED` events with full exception traces. Run the suite via `just test` (or `just check` for lint + tests).
 
----
+______________________________________________________________________
 
 ## Project Inception (Scaffolding)
 

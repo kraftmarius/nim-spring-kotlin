@@ -42,3 +42,4 @@ out/
 # Isolated dev artifacts
 .gradle-home/
 flake.lock
+.direnv

@@ -26,6 +26,7 @@
           ];
 
           shellHook = ''
+            export JAVA_HOME="${pkgs.jdk25.home}"
             export GRADLE_USER_HOME="$PWD/.gradle-home"
             echo "-> Isolated JVM/Kotlin environment ready."
           '';
