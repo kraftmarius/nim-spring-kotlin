@@ -1,4 +1,4 @@
-package com.nim.game.domain
+package com.nim.game.domain.model
 
 /**
  * Sealed hierarchy of all permissible domain errors.

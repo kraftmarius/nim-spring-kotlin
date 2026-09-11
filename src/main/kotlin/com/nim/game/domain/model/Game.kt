@@ -1,4 +1,4 @@
-package com.nim.game.domain
+package com.nim.game.domain.model
 
 /**
  * Aggregate root encapsulating game state, validation, and turn resolution.

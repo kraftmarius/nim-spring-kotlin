@@ -60,7 +60,7 @@ ______________________________________________________________________
 
 ## Testing
 
-The domain layer (`com.nim.game.domain`) is covered by a JUnit 5 unit test suite exercising `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, and `Player` turn alternation. Gradle is configured to log `PASSED` / `SKIPPED` / `FAILED` events with full exception traces. Run the suite via `just test` (or `just check` for lint + tests).
+The domain layer (`com.nim.game.domain`) is covered by a JUnit 5 unit test suite exercising `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, `Player` turn alternation, and the AI strategy layer (`OptimalStrategy` P-position correctness, `RandomStrategy` legal move bounds, `ProbabilisticStrategy` delegation distribution). Gradle is configured to log `PASSED` / `SKIPPED` / `FAILED` events with full exception traces. Run the suite via `just test` (or `just check` for lint + tests).
 
 ______________________________________________________________________
 

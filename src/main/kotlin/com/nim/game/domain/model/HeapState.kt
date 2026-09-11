@@ -1,4 +1,4 @@
-package com.nim.game.domain
+package com.nim.game.domain.model
 
 /**
  * Represents the state of all match heaps.

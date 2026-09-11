@@ -1,4 +1,4 @@
-package com.nim.game.domain
+package com.nim.game.domain.model
 
 /**
  * Invariant rules enforced during a game session.

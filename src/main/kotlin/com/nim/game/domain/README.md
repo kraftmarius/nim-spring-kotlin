@@ -1,6 +1,14 @@
 # Domain Layer — Nim Architecture & Specifications
 
-This directory contains the pure domain model for the Nim game engine. It encapsulates all core game mechanics, invariants, state transitions, and difficulty models with **zero framework dependencies**.
+This directory contains the pure domain layer for the Nim game engine. It encapsulates all core game mechanics, invariants, state transitions, and AI strategy logic with **zero framework dependencies**.
+
+## Package Structure
+
+```
+com.nim.game.domain
+├── model/          # Core domain model (aggregate root, value objects, types)
+└── strategy/       # Pluggable AI strategy implementations
+```
 
 ---
 
@@ -78,14 +86,35 @@ State validation inside `Game.applyMove(...)` evaluates only **legality** (range
 
 ---
 
+## Strategy Layer (`strategy/`)
+
+The `AiStrategy` fun interface defines the contract for computing automated player moves. Implementations are pluggable and stateless, enabling composition of difficulty profiles without coupling to specific game configurations.
+
+| Strategy | Algorithm | Applicable `Difficulty` |
+| :--- | :--- | :--- |
+| `OptimalStrategy` | Modulo arithmetic against P-positions (single-heap only). Throws `UnsupportedStrategyException` for multi-heap games. | `NIGHTMARE` |
+| `RandomStrategy` | Uniform random selection across legal moves (heap index + take count bounded by rules and physical heap size). | `I_AM_TOO_YOUNG_TO_DIE` |
+| `ProbabilisticStrategy` | Composite delegating between a `primary` and `fallback` strategy by a configurable probability threshold. | `HURT_ME_PLENTY` |
+
+### Error Contract
+
+Strategies may throw `UnsupportedStrategyException` (wrapping a `ConfigurationError`) when the game configuration is outside the strategy's supported scope. This is distinct from `InvalidMoveError` which represents illegal *player* actions.
+
+---
+
 ## Tactical Component Map
 
-| Component | Responsibility |
-| :--- | :--- |
-| `GameId` | `@JvmInline` value class wrapping `UUID` for type-safe identity. |
-| `GameRules` | Value object encapsulating `minTake`, `maxTake`, and `GameMode` (`maxTake > minTake >= 1`). |
-| `HeapState` | Value object tracking match quantities per heap index. |
-| `Move` | Value object capturing player action intent. |
-| `Game` | Aggregate Root orchestrating gameplay and state transitions. |
-| `DomainError` | Sealed hierarchy of domain and rule violations (`InvalidMoveError`, `ConfigurationError`). |
-| `Difficulty` | Difficulty level selector (`I_AM_TOO_YOUNG_TO_DIE`, `HURT_ME_PLENTY`, `NIGHTMARE`). |
+| Component | Package | Responsibility |
+| :--- | :--- | :--- |
+| `GameId` | `model` | `@JvmInline` value class wrapping `UUID` for type-safe identity. |
+| `GameRules` | `model` | Value object encapsulating `minTake`, `maxTake`, and `GameMode` (`maxTake > minTake >= 1`). |
+| `HeapState` | `model` | Value object tracking match quantities per heap index. |
+| `Move` | `model` | Value object capturing player action intent. |
+| `Game` | `model` | Aggregate Root orchestrating gameplay and state transitions. |
+| `DomainError` | `model` | Sealed hierarchy of domain and rule violations (`InvalidMoveError`, `ConfigurationError`). |
+| `Difficulty` | `model` | Difficulty level selector (`I_AM_TOO_YOUNG_TO_DIE`, `HURT_ME_PLENTY`, `NIGHTMARE`). |
+| `AiStrategy` | `strategy` | Fun interface defining the contract for automated move computation. |
+| `OptimalStrategy` | `strategy` | Mathematically optimal move via P-position targeting (single-heap). |
+| `RandomStrategy` | `strategy` | Uniform random legal move selection. |
+| `ProbabilisticStrategy` | `strategy` | Composite strategy delegating between two strategies by probability. |
+| `UnsupportedStrategyException` | `strategy` | Thrown when a strategy cannot handle the game configuration. |
