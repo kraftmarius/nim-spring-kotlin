@@ -14,12 +14,63 @@ The system implements the subtraction game **Nim** across one or more heaps, wit
 
 ______________________________________________________________________
 
+## API Endpoints
+
+All endpoints are versioned under `/api/v1` and exchange JSON. All errors follow RFC 9457 (`application/problem+json`).
+
+| Method | Path | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/v1/games` | Create a game session. All request fields are optional; omitted values fall back to configuration defaults. |
+| `GET` | `/api/v1/games/{id}` | Retrieve heap state, current turn, status, and move history for a game. |
+| `POST` | `/api/v1/games/{id}/moves` | Submit a player move; the AI counter-move resolves within the same request. |
+
+**Difficulty & heap support:**
+
+| Difficulty | Behavior | Multi-heap |
+| :--- | :--- | :--- |
+| `I_AM_TOO_YOUNG_TO_DIE` | Uniform random play | Supported |
+| `HURT_ME_PLENTY` | 50/50 optimal/random composite | Rejected (`501 Not Implemented`) |
+| `NIGHTMARE` | Optimal P-position play | Rejected (`501 Not Implemented`) |
+
+Full request/response schemas and the error-handling matrix are documented in [`api/README.md`](src/main/kotlin/com/nim/game/api/README.md).
+
+______________________________________________________________________
+
 ## Technical Stack & Architectural Decisions
 
 - **Kotlin & JVM 25 (LTS):** Chosen for modern language ergonomics (immutability, data classes, null safety) on the LTS runtime.
 - **Spring Boot 4.1.1:** Latest release track, avoiding milestones or unstable snapshots.
 - **Minimal Dependencies:** Core framework starters limited to `org.springframework.boot:spring-boot-starter-webmvc` and `org.springframework.boot:spring-boot-starter-validation`. `kotlin-reflect` and `jackson-module-kotlin` are included for Kotlin serialization support.
 - **Dev Environment Isolation (NixOS / Flakes):** The project includes a `flake.nix` providing JDK 25, `just`, and `ktlint`. Gradle caches are scoped strictly to `.gradle-home/` to ensure zero pollution of the host environment.
+
+______________________________________________________________________
+
+## Project Architecture
+
+The codebase follows a strict layered architecture with unidirectional dependency flow — outer layers depend on inner layers, never the reverse:
+
+| Layer | Package | Responsibility |
+| :--- | :--- | :--- |
+| **API** (Presentation) | `com.nim.game.api` | Inbound REST transport, request/response DTOs, and RFC 9457 error mapping. |
+| **Application** | `com.nim.game.application` | Use-case orchestration, session persistence, strategy resolution, and configuration binding. |
+| **Domain** | `com.nim.game.domain` | Pure game mechanics, invariants, state transitions, and AI strategies (zero framework dependencies). |
+
+Each layer documents its own contract in a dedicated `README.md` within its package.
+
+______________________________________________________________________
+
+## Configuration
+
+Game defaults are externalized under the `nim.default` prefix and overridable via environment variables or `application.properties`. Explicit request fields always take precedence over these defaults.
+
+| Property | Default | Description |
+| :--- | :--- | :--- |
+| `nim.default.initial-matches` | `13` | Initial heap size when `heaps` is omitted. |
+| `nim.default.min-take` | `1` | Minimum matches removable per move. |
+| `nim.default.max-take` | `3` | Maximum matches removable per move. |
+| `nim.default.mode` | `MISERE` | Win condition: `NORMAL` or `MISERE`. |
+| `nim.default.difficulty` | `I_AM_TOO_YOUNG_TO_DIE` | AI difficulty level. |
+| `nim.default.starting-player` | `HUMAN` | Which player opens the game. |
 
 ______________________________________________________________________
 
@@ -60,7 +111,13 @@ ______________________________________________________________________
 
 ## Testing
 
-The domain layer (`com.nim.game.domain`) is covered by a JUnit 5 unit test suite exercising `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, `Player` turn alternation, and the AI strategy layer (`OptimalStrategy` P-position correctness, `RandomStrategy` legal move bounds, `ProbabilisticStrategy` delegation distribution). Gradle is configured to log `PASSED` / `SKIPPED` / `FAILED` events with full exception traces. Run the suite via `just test` (or `just check` for lint + tests).
+The JUnit 5 test suite spans all three layers:
+
+- **Domain** (`com.nim.game.domain`): `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, `Player` turn alternation, and the AI strategy layer (`OptimalStrategy` P-position correctness, `RandomStrategy` legal move bounds, `ProbabilisticStrategy` delegation distribution).
+- **Application** (`com.nim.game.application`): `GameService` orchestration — game creation, AI opening move, the human + AI turn cycle, and illegal-move rejection.
+- **API** (`com.nim.game.api`): `GameController` contract via `@WebMvcTest` — status codes, `Location` header, and RFC 9457 error mapping.
+
+Gradle is configured to log `PASSED` / `SKIPPED` / `FAILED` events with full exception traces. Run the suite via `just test` (or `just check` for lint + tests).
 
 ______________________________________________________________________
 

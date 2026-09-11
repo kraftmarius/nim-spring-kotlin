@@ -1,7 +1,7 @@
 package com.nim.game.domain.model
 
 /**
- * Aggregate root encapsulating game state, validation, and turn resolution.
+ * Aggregate root encapsulating game state, validation, turn resolution and move history.
  */
 data class Game(
     val id: GameId = GameId.random(),
@@ -11,6 +11,7 @@ data class Game(
     val currentTurn: Player = Player.HUMAN,
     val status: GameStatus = GameStatus.IN_PROGRESS,
     val winner: Player? = null,
+    val history: List<Move> = emptyList(),
 ) {
     init {
         if (heapState.isEmpty()) {
@@ -50,6 +51,7 @@ data class Game(
         }
 
         val updatedHeapState = heapState.take(move.heapIndex, move.matches)
+        val updatedHistory = history + move
 
         return if (updatedHeapState.isEmpty()) {
             val resolvedWinner =
@@ -63,6 +65,7 @@ data class Game(
                     heapState = updatedHeapState,
                     status = GameStatus.FINISHED,
                     winner = resolvedWinner,
+                    history = updatedHistory,
                 ),
             )
         } else {
@@ -70,6 +73,7 @@ data class Game(
                 copy(
                     heapState = updatedHeapState,
                     currentTurn = currentTurn.next(),
+                    history = updatedHistory,
                 ),
             )
         }
