@@ -38,7 +38,7 @@ class RandomStrategyTest {
         val game =
             Game(
                 heapState = HeapState.single(2),
-                rules = GameRules(minTake = 1, maxTake = 3),
+                rules = GameRules(maxTake = 3),
                 currentTurn = Player.COMPUTER,
             )
 

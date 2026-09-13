@@ -21,7 +21,6 @@ class GameService(
 ) {
     fun createGame(request: CreateGameRequest): Game {
         val resolvedHeaps = request.heaps ?: listOf(properties.initialMatches)
-        val minTake = request.minTake ?: properties.minTake
         val maxTake = request.maxTake ?: properties.maxTake
         val mode = request.mode ?: properties.mode
         val difficulty = request.difficulty ?: properties.difficulty
@@ -36,7 +35,7 @@ class GameService(
         val initialGame =
             Game(
                 heapState = HeapState(resolvedHeaps),
-                rules = GameRules(minTake = minTake, maxTake = maxTake, mode = mode),
+                rules = GameRules(maxTake = maxTake, mode = mode),
                 difficulty = difficulty,
                 currentTurn = startingPlayer,
             )

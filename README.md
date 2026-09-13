@@ -8,7 +8,7 @@ ______________________________________________________________________
 
 The system implements the subtraction game **Nim** across one or more heaps, with both the **normal** and **misère** variants:
 
-- **Rules:** Two players (Human vs. Computer) take turns removing matches from a single heap per turn. The take range is configurable via `GameRules` (default: **1–3**).
+- **Rules:** Two players (Human vs. Computer) take turns removing matches from a single heap per turn. Each move removes between **1** (fixed minimum) and a configurable maximum (default: **3**) matches, as defined by `GameRules`.
 - **Normal Condition:** The player who takes the **last match wins**.
 - **Misère Condition:** The player forced to take the **last match loses**.
 
@@ -66,8 +66,7 @@ Game defaults are externalized under the `nim.default` prefix and overridable vi
 | Property | Default | Description |
 | :--- | :--- | :--- |
 | `nim.default.initial-matches` | `13` | Initial heap size when `heaps` is omitted. |
-| `nim.default.min-take` | `1` | Minimum matches removable per move. |
-| `nim.default.max-take` | `3` | Maximum matches removable per move. |
+| `nim.default.max-take` | `3` | Maximum matches removable per move. The minimum is fixed at `1`. |
 | `nim.default.mode` | `MISERE` | Win condition: `NORMAL` or `MISERE`. |
 | `nim.default.difficulty` | `I_AM_TOO_YOUNG_TO_DIE` | AI difficulty level. |
 | `nim.default.starting-player` | `HUMAN` | Which player opens the game. |

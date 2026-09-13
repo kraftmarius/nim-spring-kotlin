@@ -45,7 +45,6 @@ Initializes a new game session. All body parameters are optional and fall back t
   ```json
   {
     "heaps": [13],
-    "minTake": 1,
     "maxTake": 3,
     "mode": "MISERE",
     "difficulty": "NIGHTMARE",
@@ -103,7 +102,6 @@ ______________________________________________________________________
   "winner": null,
   "difficulty": "NIGHTMARE",
   "rules": {
-    "minTake": 1,
     "maxTake": 3,
     "mode": "MISERE"
   },
@@ -128,7 +126,7 @@ All exceptions caught by `GlobalExceptionHandler` produce an RFC 9457 `applicati
 | Exception | HTTP Status | Problem Detail Description |
 | :--- | :--- | :--- |
 | `MethodArgumentNotValidException` | `400 Bad Request` | Bean validation errors (e.g. `matches: matches must be at least 1`). |
-| `IllegalArgumentException` | `400 Bad Request` | Contradictory or invalid request parameters (e.g. `maxTake` < `minTake`). |
+| `IllegalArgumentException` | `400 Bad Request` | Invalid request parameters (e.g. `maxTake` not greater than `1`). |
 | `InvalidMoveException` | `400 Bad Request` | Domain rule violations (e.g. out of turn, take exceeds maxTake). |
 | `GameNotFoundException` | `404 Not Found` | The requested `gameId` does not exist in memory. |
 | `UnsupportedStrategyException` | `501 Not Implemented` | Strategy cannot support the requested configuration (e.g. multi-heap on `HURT_ME_PLENTY` or `NIGHTMARE`). |

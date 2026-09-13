@@ -11,7 +11,6 @@ import java.util.UUID
 
 data class CreateGameRequest(
     val heaps: List<Int>? = null,
-    val minTake: Int? = null,
     val maxTake: Int? = null,
     val mode: GameMode? = null,
     val difficulty: Difficulty? = null,
@@ -41,7 +40,6 @@ data class MoveDto(
 }
 
 data class GameRulesDto(
-    val minTake: Int,
     val maxTake: Int,
     val mode: GameMode,
 )
@@ -70,7 +68,6 @@ data class GameResponse(
                 difficulty = game.difficulty,
                 rules =
                     GameRulesDto(
-                        minTake = game.rules.minTake,
                         maxTake = game.rules.maxTake,
                         mode = game.rules.mode,
                     ),

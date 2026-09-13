@@ -44,7 +44,7 @@ data class Game(
         }
 
         val maxAllowed = minOf(rules.maxTake, currentHeapSize)
-        val minAllowed = rules.minTake
+        val minAllowed = GameRules.MIN_TAKE
 
         if (move.matches !in minAllowed..maxAllowed) {
             return MoveResult.Failure(InvalidMoveError.TakeOutOfAllowedRange(move.matches, minAllowed, maxAllowed))

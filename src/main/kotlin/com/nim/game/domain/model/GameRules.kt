@@ -2,14 +2,20 @@ package com.nim.game.domain.model
 
 /**
  * Invariant rules enforced during a game session.
+ *
+ * The minimum take is a fixed constant ([MIN_TAKE]) by the rules of Nim: a player must always
+ * remove at least one match per move. Only the maximum take is configurable.
  */
 data class GameRules(
-    val minTake: Int = 1,
     val maxTake: Int = 3,
     val mode: GameMode = GameMode.MISERE,
 ) {
     init {
-        require(minTake >= 1) { "minTake must be at least 1, but was $minTake" }
-        require(maxTake > minTake) { "maxTake ($maxTake) must be greater than minTake ($minTake)" }
+        require(maxTake > MIN_TAKE) { "maxTake ($maxTake) must be greater than $MIN_TAKE" }
+    }
+
+    companion object {
+        /** Minimum matches removable per move. Fixed by the rules of Nim. */
+        const val MIN_TAKE = 1
     }
 }

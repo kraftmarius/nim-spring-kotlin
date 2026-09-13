@@ -69,7 +69,7 @@ class GameTest {
         val game =
             Game(
                 heapState = HeapState.single(10),
-                rules = GameRules(minTake = 1, maxTake = 3),
+                rules = GameRules(maxTake = 3),
                 currentTurn = Player.HUMAN,
             )
 
@@ -88,7 +88,7 @@ class GameTest {
         val game =
             Game(
                 heapState = HeapState.single(2),
-                rules = GameRules(minTake = 1, maxTake = 3),
+                rules = GameRules(maxTake = 3),
                 currentTurn = Player.HUMAN,
             )
 
@@ -123,7 +123,7 @@ class GameTest {
         val game =
             Game(
                 heapState = HeapState.single(2),
-                rules = GameRules(minTake = 1, maxTake = 3, mode = GameMode.MISERE),
+                rules = GameRules(maxTake = 3, mode = GameMode.MISERE),
                 currentTurn = Player.HUMAN,
             )
 
@@ -141,7 +141,7 @@ class GameTest {
         val game =
             Game(
                 heapState = HeapState.single(2),
-                rules = GameRules(minTake = 1, maxTake = 3, mode = GameMode.NORMAL),
+                rules = GameRules(maxTake = 3, mode = GameMode.NORMAL),
                 currentTurn = Player.HUMAN,
             )
 

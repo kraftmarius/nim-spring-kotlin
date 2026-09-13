@@ -57,9 +57,9 @@ class GameControllerTest {
 
     @Test
     fun `POST games returns 400 when game rules are contradictory`() {
-        val request = CreateGameRequest(minTake = 5, maxTake = 2)
+        val request = CreateGameRequest(maxTake = 1)
         `when`(gameService.createGame(request)).thenThrow(
-            IllegalArgumentException("maxTake (2) must be greater than minTake (5)"),
+            IllegalArgumentException("maxTake (1) must be greater than 1"),
         )
 
         mockMvc
@@ -68,7 +68,7 @@ class GameControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             ).andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.detail").value("maxTake (2) must be greater than minTake (5)"))
+            .andExpect(jsonPath("$.detail").value("maxTake (1) must be greater than 1"))
     }
 
     @Test

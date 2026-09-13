@@ -1,6 +1,7 @@
 package com.nim.game.domain.strategy
 
 import com.nim.game.domain.model.Game
+import com.nim.game.domain.model.GameRules
 import com.nim.game.domain.model.Move
 import java.util.random.RandomGenerator
 
@@ -19,7 +20,7 @@ class RandomStrategy(
         val targetHeapIndex = nonZeroIndices[random.nextInt(nonZeroIndices.size)]
         val currentHeapSize = game.heapState.heaps[targetHeapIndex]
 
-        val minAllowed = game.rules.minTake
+        val minAllowed = GameRules.MIN_TAKE
         val maxAllowed = minOf(game.rules.maxTake, currentHeapSize)
 
         val matchesToTake =

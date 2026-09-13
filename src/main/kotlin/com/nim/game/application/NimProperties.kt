@@ -11,7 +11,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "nim.default")
 data class NimProperties(
     val initialMatches: Int = 13,
-    val minTake: Int = 1,
     val maxTake: Int = 3,
     val mode: GameMode = GameMode.MISERE,
     val difficulty: Difficulty = Difficulty.I_AM_TOO_YOUNG_TO_DIE,

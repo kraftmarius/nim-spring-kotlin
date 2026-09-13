@@ -41,7 +41,7 @@ class OptimalStrategyTest {
 
     @ParameterizedTest(name = "Misere: On losing P-position heap {0} -> defensive fallback take 1")
     @CsvSource("1", "5", "9", "13")
-    fun `misere mode falls back to minTake when already in losing position`(heapSize: Int) {
+    fun `misere mode falls back to the minimum take when already in losing position`(heapSize: Int) {
         val game = createSingleHeapGame(heapSize, GameMode.MISERE)
 
         val move = strategy.determineMove(game)
@@ -71,7 +71,7 @@ class OptimalStrategyTest {
 
     @ParameterizedTest(name = "Normal: On losing P-position heap {0} -> defensive fallback take 1")
     @CsvSource("4", "8", "12")
-    fun `normal mode falls back to minTake when already in losing position`(heapSize: Int) {
+    fun `normal mode falls back to the minimum take when already in losing position`(heapSize: Int) {
         val game = createSingleHeapGame(heapSize, GameMode.NORMAL)
 
         val move = strategy.determineMove(game)
@@ -103,7 +103,7 @@ class OptimalStrategyTest {
     ): Game =
         Game(
             heapState = HeapState.single(matches),
-            rules = GameRules(minTake = 1, maxTake = 3, mode = mode),
+            rules = GameRules(maxTake = 3, mode = mode),
             currentTurn = Player.COMPUTER,
         )
 }

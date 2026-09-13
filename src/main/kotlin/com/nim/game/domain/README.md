@@ -36,7 +36,7 @@ Strictly separate **intrinsic structural validity** from **contextual business r
 ```
   +---------------------------------------------------------------+
   |                      Game (Aggregate Root)                    |
-  | Contextual Rules: turn matching, minTake/maxTake constraints, |
+  | Contextual Rules: turn matching, maxTake constraint,          |
   | win/loss conditions, active/finished game state               |
   +-------------------------------+-------------------------------+
                                   |
@@ -57,7 +57,7 @@ Strictly separate **intrinsic structural validity** from **contextual business r
 
 ### 2. Contextual Invariants (Aggregate Root)
 - **`Game`:** Owns the combined context of `HeapState`, `GameRules`, and player turns.
-- Only the `Game` aggregate decides whether a move is legal relative to `rules.minTake`, `rules.maxTake`, current game status, and player identity.
+- Only the `Game` aggregate decides whether a move is legal relative to `rules.maxTake` (with the minimum take fixed at `GameRules.MIN_TAKE = 1`), current game status, and player identity.
 - Validation failures at this level produce typed `InvalidMoveError` representations for API translation (RFC 9457 Problem Details).
 
 ---
@@ -70,7 +70,7 @@ The domain aggregate enforces the terminal state solely based on the remaining m
 * **Misère Play (Default):** The player who executed the move that reduced the matches to `0` **loses**. The opposing player is declared the winner (`winner = move.player.next()`).
 * **Normal Play:** The player who executed the move that reduced the matches to `0` **wins** (`winner = move.player`).
 
-State validation inside `Game.applyMove(...)` evaluates only **legality** (range `minTake..maxTake`, active turn, valid heap index).
+State validation inside `Game.applyMove(...)` evaluates only **legality** (range `1..maxTake`, active turn, valid heap index).
 
 ### State Transitions (`applyMove`)
 1. **Validation:** Checks game lifecycle (`IN_PROGRESS`), active turn (`currentTurn == move.player`), and rule boundaries.
@@ -107,7 +107,7 @@ Strategies may throw `UnsupportedStrategyException` (wrapping a `ConfigurationEr
 | Component | Package | Responsibility |
 | :--- | :--- | :--- |
 | `GameId` | `model` | `@JvmInline` value class wrapping `UUID` for type-safe identity. |
-| `GameRules` | `model` | Value object encapsulating `minTake`, `maxTake`, and `GameMode` (`maxTake > minTake >= 1`). |
+| `GameRules` | `model` | Value object encapsulating `maxTake` and `GameMode` (`maxTake > 1`). The minimum take is a fixed constant `MIN_TAKE = 1`. |
 | `HeapState` | `model` | Value object tracking match quantities per heap index. |
 | `Move` | `model` | Value object capturing player action intent. |
 | `Game` | `model` | Aggregate Root orchestrating gameplay and state transitions. |

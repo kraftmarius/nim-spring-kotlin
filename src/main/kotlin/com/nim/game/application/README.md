@@ -34,7 +34,7 @@ ______________________________________________________________________
 
 1. **12-Factor Configuration Hierarchy:**
 
-   - Default game rules (`initialMatches`, `minTake`, `maxTake`, `mode`, `difficulty`, `startingPlayer`) are declared in `NimProperties` via `@ConfigurationProperties(prefix = "nim.default")`.
+    - Default game rules (`initialMatches`, `maxTake`, `mode`, `difficulty`, `startingPlayer`) are declared in `NimProperties` via `@ConfigurationProperties(prefix = "nim.default")`.
    - Explicit request values take precedence; omitted fields seamlessly fall back to configuration defaults.
 
 ______________________________________________________________________

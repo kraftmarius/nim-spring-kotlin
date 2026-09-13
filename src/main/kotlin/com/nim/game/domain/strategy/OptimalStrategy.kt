@@ -4,6 +4,7 @@ import com.nim.game.domain.model.ConfigurationError
 import com.nim.game.domain.model.Difficulty
 import com.nim.game.domain.model.Game
 import com.nim.game.domain.model.GameMode
+import com.nim.game.domain.model.GameRules
 import com.nim.game.domain.model.Move
 
 /**
@@ -26,7 +27,7 @@ class OptimalStrategy : AiStrategy {
 
         val heapSize = game.heapState.heaps[0]
         val modulus = game.rules.maxTake + 1
-        val minTake = game.rules.minTake
+        val minAllowed = GameRules.MIN_TAKE
         val maxTake = minOf(game.rules.maxTake, heapSize)
 
         val targetRemainder =
@@ -38,11 +39,11 @@ class OptimalStrategy : AiStrategy {
         val remainder = (heapSize - targetRemainder).mod(modulus)
 
         val matchesToTake =
-            if (remainder in minTake..maxTake) {
+            if (remainder in minAllowed..maxTake) {
                 remainder
             } else {
                 // Already in a losing P-position; execute a defensive fallback move.
-                minTake
+                minAllowed
             }
 
         return Move(
