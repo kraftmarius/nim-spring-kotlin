@@ -8,7 +8,8 @@ This directory contains the inbound HTTP presentation layer for the Nim game eng
 com.nim.game.api
 ├── GameController.kt         # Spring WebMvc REST controller
 ├── GameDtos.kt               # Strongly typed Request/Response models
-└── GlobalExceptionHandler.kt # RFC 9457 ProblemDetail error mapping
+├── GlobalExceptionHandler.kt # RFC 9457 ProblemDetail error mapping
+└── HealthController.kt       # Health check endpoint with game metrics
 ```
 
 ______________________________________________________________________
@@ -26,9 +27,10 @@ ______________________________________________________________________
 
 1. **RESTful Resource Semantics:**
 
-   - Resource collection: `/api/v1/games`
-   - Individual session: `/api/v1/games/{id}`
-   - Action sub-resource: `/api/v1/games/{id}/moves`
+    - Resource collection: `/api/v1/games`
+    - Individual session: `/api/v1/games/{id}`
+    - Action sub-resource: `/api/v1/games/{id}/moves`
+    - Health check: `/api/v1/health`
 
 ______________________________________________________________________
 
@@ -59,7 +61,18 @@ Initializes a new game session. All body parameters are optional and fall back t
 
 ______________________________________________________________________
 
-### 2. Get Game State
+### 2. List All Games
+
+Returns all stored game sessions.
+
+- **Method:** `GET`
+- **Path:** `/api/v1/games`
+- **Response:** `200 OK`
+- **Response Body:** `List<GameResponse>`
+
+______________________________________________________________________
+
+### 3. Get Game State
 
 Retrieves the current state, heap counts, turn ownership, and move history of an existing game.
 
@@ -70,7 +83,7 @@ Retrieves the current state, heap counts, turn ownership, and move history of an
 
 ______________________________________________________________________
 
-### 3. Make Move
+### 4. Make Move
 
 Executes a player move on a designated heap. The server automatically evaluates the move, checks victory conditions, and triggers the AI counter-move within the same request.
 
@@ -89,6 +102,25 @@ Executes a player move on a designated heap. The server automatically evaluates 
   - `heapIndex`: Must be `>= 0`
 - **Response:** `200 OK`
 - **Response Body:** `GameResponse`
+
+______________________________________________________________________
+
+### 5. Health Check
+
+Returns service liveness with current game metrics.
+
+- **Method:** `GET`
+- **Path:** `/api/v1/health`
+- **Response:** `200 OK`
+- **Response Body:** `HealthResponse`
+
+```json
+{
+  "timestamp": "2026-09-14T12:00:00Z",
+  "activeGames": 2,
+  "totalGames": 5
+}
+```
 
 ______________________________________________________________________
 
@@ -127,9 +159,11 @@ All exceptions caught by `GlobalExceptionHandler` produce an RFC 9457 `applicati
 | Exception | HTTP Status | Problem Detail Description |
 | :--- | :--- | :--- |
 | `MethodArgumentNotValidException` | `400 Bad Request` | Bean validation errors (e.g. `matches: matches must be at least 1`). |
+| `HttpMessageNotReadableException` | `400 Bad Request` | Malformed or unreadable JSON request payload. |
 | `IllegalArgumentException` | `400 Bad Request` | Invalid request parameters (e.g. `maxTake` not greater than `1`). |
 | `InvalidMoveException` | `400 Bad Request` | Domain rule violations (e.g. out of turn, take exceeds maxTake). |
 | `GameNotFoundException` | `404 Not Found` | The requested `gameId` does not exist in memory. |
+| `HttpRequestMethodNotSupportedException` | `405 Method Not Allowed` | The HTTP method is not supported for the requested path. |
 | `UnsupportedStrategyException` | `501 Not Implemented` | Strategy cannot support the requested configuration (e.g. multi-heap on `HURT_ME_PLENTY` or `NIGHTMARE`). |
 
 ______________________________________________________________________
@@ -139,9 +173,11 @@ ______________________________________________________________________
 | Component | Responsibility |
 | :--- | :--- |
 | `GameController` | Spring `@RestController` handling `/api/v1/games` routing and HTTP status codes. |
+| `HealthController` | Spring `@RestController` exposing `/api/v1/health` with active and total game counts. |
 | `GlobalExceptionHandler` | `@RestControllerAdvice` mapping application and domain errors to RFC 9457 `ProblemDetail`. |
 | `CreateGameRequest` | DTO capturing optional game creation parameters with defaults. |
 | `MakeMoveRequest` | DTO capturing player actions with `@field:Min` constraints. |
 | `GameResponse` | Primary response DTO presenting heap state, rules, status, and move history. |
+| `HealthResponse` | DTO for the health endpoint: timestamp, active game count, total game count. |
 | `MoveDto` | DTO representing individual player actions. |
 | `GameRulesDto` | DTO representing configured session rules. |

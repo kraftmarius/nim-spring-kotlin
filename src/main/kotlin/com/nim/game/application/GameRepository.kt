@@ -18,9 +18,11 @@ class GameRepository {
         return game
     }
 
+    fun totalGames(): Int = storage.size
+
+    fun activeGames(): Int = storage.values.count { !it.isOver() }
+
     fun findById(id: GameId): Game? = storage[id]
 
-    /** Number of stored games. */
-    val size: Int
-        get() = storage.size
+    fun findAll(): List<Game> = storage.values.toList()
 }

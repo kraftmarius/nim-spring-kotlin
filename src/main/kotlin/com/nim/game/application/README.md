@@ -98,8 +98,8 @@ ______________________________________________________________________
 
 | Component | Responsibility |
 | :--- | :--- |
-| `GameService` | Orchestrates game creation, moves, AI turn triggering, and repository updates. |
-| `GameRepository` | In-memory `ConcurrentHashMap` store for active and completed game sessions. |
+| `GameService` | Orchestrates game creation, game listing, moves, AI turn triggering, and repository updates. |
+| `GameRepository` | In-memory `ConcurrentHashMap` store for active and completed game sessions. Exposes `totalGames()`, `activeGames()`, and `findAll()` query methods. |
 | `AiStrategyResolver` | Resolves `Difficulty` enums into `AiStrategy` instances: pure strategies at the probability poles, an optimal/random blend in between. |
 | `NimProperties` | `@ConfigurationProperties` data class holding default game settings. |
 | `GameNotFoundException` | Thrown when an operation targets a non-existent `GameId`. |

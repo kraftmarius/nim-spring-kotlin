@@ -114,7 +114,7 @@ class GameServiceTest {
         }
 
         // Rejected configurations must not be persisted
-        assertEquals(0, repository.size)
+        assertEquals(0, repository.totalGames())
     }
 
     @Test
@@ -183,5 +183,24 @@ class GameServiceTest {
         assertThrows<InvalidMoveException> {
             service.makeMove(game.id, heapIndex = 0, matches = 5)
         }
+    }
+
+    @Test
+    fun `getAllGames returns all stored games`() {
+        val service =
+            GameService(
+                repository = repository,
+                strategyResolver = AiStrategyResolver(),
+                properties = properties,
+            )
+
+        val game1 = service.createGame(CreateGameRequest(heaps = listOf(10), startingPlayer = Player.HUMAN))
+        val game2 = service.createGame(CreateGameRequest(heaps = listOf(7, 3), startingPlayer = Player.HUMAN))
+
+        val allGames = service.getAllGames()
+
+        assertEquals(2, allGames.size)
+        assertTrue(allGames.any { it.id == game1.id })
+        assertTrue(allGames.any { it.id == game2.id })
     }
 }

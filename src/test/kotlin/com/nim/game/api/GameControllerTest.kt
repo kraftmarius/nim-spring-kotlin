@@ -72,6 +72,23 @@ class GameControllerTest {
     }
 
     @Test
+    fun `GET games returns 200 with list of all games`() {
+        val game =
+            Game(
+                id = GameId.random(),
+                heapState = HeapState.single(13),
+                currentTurn = Player.HUMAN,
+            )
+        `when`(gameService.getAllGames()).thenReturn(listOf(game))
+
+        mockMvc
+            .perform(get("/api/v1/games"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].id").value(game.id.value.toString()))
+    }
+
+    @Test
     fun `GET games by id returns 200 on existing game`() {
         val gameId = GameId.random()
         val game = Game(id = gameId, heapState = HeapState.single(7), currentTurn = Player.HUMAN)

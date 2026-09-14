@@ -68,6 +68,8 @@ class GameService(
         return repository.save(gameToSave)
     }
 
+    fun getAllGames(): List<Game> = repository.findAll()
+
     fun getGame(id: GameId): Game = repository.findById(id) ?: throw GameNotFoundException(id)
 
     fun makeMove(

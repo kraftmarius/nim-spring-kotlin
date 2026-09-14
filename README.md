@@ -21,8 +21,10 @@ All endpoints are versioned under `/api/v1` and exchange JSON. All errors follow
 | Method | Path | Description |
 | :--- | :--- | :--- |
 | `POST` | `/api/v1/games` | Create a game session. All request fields are optional. Omitted `heaps` and `startingPlayer` are randomized; other omitted fields fall back to configuration defaults. |
+| `GET` | `/api/v1/games` | List all stored game sessions. |
 | `GET` | `/api/v1/games/{id}` | Retrieve heap state, current turn, status, and move history for a game. |
 | `POST` | `/api/v1/games/{id}/moves` | Submit a player move; the AI counter-move resolves within the same request. |
+| `GET` | `/api/v1/health` | Health check returning timestamp, active game count, and total game count. |
 
 **Difficulty & heap support:**
 
@@ -115,8 +117,8 @@ ______________________________________________________________________
 The JUnit 5 test suite spans all three layers:
 
 - **Domain** (`com.nim.game.domain`): `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, `Player` turn alternation, `Difficulty` probability parameterization, and the AI strategy layer (`OptimalStrategy` P-position correctness, `RandomStrategy` legal move bounds).
-- **Application** (`com.nim.game.application`): `GameService` orchestration — game creation, AI opening move, the human + AI turn cycle, illegal-move rejection, and `AiStrategyResolver` optimal/random blend resolution.
-- **API** (`com.nim.game.api`): `GameController` contract via `@WebMvcTest` — status codes, `Location` header, and RFC 9457 error mapping.
+- **Application** (`com.nim.game.application`): `GameService` orchestration — game creation, game listing, AI opening move, the human + AI turn cycle, illegal-move rejection, and `AiStrategyResolver` optimal/random blend resolution. `GameRepository` — `totalGames`, `activeGames`, and `findAll` query methods.
+- **API** (`com.nim.game.api`): `GameController` contract via `@WebMvcTest` — status codes, `Location` header, and RFC 9457 error mapping. `GlobalExceptionHandler` — 405 Method Not Allowed and 400 malformed-JSON ProblemDetail responses. `HealthController` — liveness endpoint with repository game metrics.
 
 Gradle is configured to log `PASSED` / `SKIPPED` / `FAILED` events with full exception traces. Run the suite via `just test` (or `just check` for lint + tests).
 

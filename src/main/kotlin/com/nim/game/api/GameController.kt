@@ -28,6 +28,13 @@ class GameController(
         return ResponseEntity.created(location).body(GameResponse.from(game))
     }
 
+    @GetMapping
+    fun getAllGames(): ResponseEntity<List<GameResponse>> {
+        val games = gameService.getAllGames()
+
+        return ResponseEntity.ok(games.map { GameResponse.from(it) })
+    }
+
     @GetMapping("/{id}")
     fun getGame(
         @PathVariable id: UUID,
