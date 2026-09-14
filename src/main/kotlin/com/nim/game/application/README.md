@@ -84,13 +84,13 @@ ______________________________________________________________________
 
 ## Strategy Resolution (`AiStrategyResolver`)
 
-The resolver maps each `Difficulty` to a concrete `AiStrategy` based on a single parameter: `Difficulty.optimalProbability`. Blended difficulties (0.0 < p < 1.0) coin-flip between optimal math and random play per move; the poles short-circuit to the pure strategies, consuming no randomness.
+The resolver maps each `Difficulty` to a concrete `AiStrategy` based on a single parameter: `Difficulty.optimalProbability`. Blended difficulties (0.0 < p < 1.0) coin-flip between optimal math and random play per move; the poles short-circuit to the pure strategies with no resolver-level coin flip.
 
 | Difficulty | `optimalProbability` | Resolved Behavior |
 | :--- | :--- | :--- |
 | `I_AM_TOO_YOUNG_TO_DIE` | `0.0` | Pure `RandomStrategy` — uniform stochastic move selection across all non-empty heaps. Multi-heap supported. |
 | `HURT_ME_PLENTY` | `0.5` | Blend: optimal move with probability 0.5, otherwise random. Single-heap only; multi-heap requests rejected with `UnsupportedStrategyException`. |
-| `NIGHTMARE` | `1.0` | Pure `OptimalStrategy` — deterministic modulo arithmetic against Nim P-positions. Single-heap only; multi-heap requests rejected with `UnsupportedStrategyException`. |
+| `NIGHTMARE` | `1.0` | Pure `OptimalStrategy` — modulo arithmetic against Nim P-positions, with a stochastic fallback in losing P-positions. Single-heap only; multi-heap requests rejected with `UnsupportedStrategyException`. |
 
 ______________________________________________________________________
 

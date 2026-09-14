@@ -4,12 +4,15 @@ import com.nim.game.domain.model.Game
 import com.nim.game.domain.model.GameMode
 import com.nim.game.domain.model.GameRules
 import com.nim.game.domain.model.Move
+import java.util.random.RandomGenerator
 
 /**
  * Mathematical solver for the subtraction game variant of Nim.
  * Computes optimal moves using modulo arithmetic against P-positions.
  */
-class OptimalStrategy : AiStrategy {
+class OptimalStrategy(
+    private val random: RandomGenerator = RandomGenerator.getDefault(),
+) : AiStrategy {
     override fun determineMove(game: Game): Move {
         check(!game.isOver()) { "Cannot determine move for a finished game." }
         check(!game.heapState.isEmpty()) { "Cannot determine move when heaps are empty." }
@@ -20,7 +23,7 @@ class OptimalStrategy : AiStrategy {
 
         val heapSize = game.heapState.heaps[0]
         val modulus = game.rules.maxTake + 1
-        val minAllowed = GameRules.MIN_TAKE
+        val minTake = GameRules.MIN_TAKE
         val maxTake = minOf(game.rules.maxTake, heapSize)
 
         val targetRemainder =
@@ -32,11 +35,15 @@ class OptimalStrategy : AiStrategy {
         val remainder = (heapSize - targetRemainder).mod(modulus)
 
         val matchesToTake =
-            if (remainder in minAllowed..maxTake) {
+            if (remainder in minTake..maxTake) {
                 remainder
             } else {
-                // Already in a losing P-position; execute a defensive fallback move.
-                minAllowed
+                // Losing P-position: execute an unpredictable stochastic fallback move
+                if (minTake == maxTake) {
+                    minTake
+                } else {
+                    random.nextInt(minTake, maxTake + 1)
+                }
             }
 
         return Move(

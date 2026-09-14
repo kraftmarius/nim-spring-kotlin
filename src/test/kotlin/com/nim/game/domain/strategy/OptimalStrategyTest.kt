@@ -4,6 +4,7 @@ import com.nim.game.domain.model.Game
 import com.nim.game.domain.model.GameMode
 import com.nim.game.domain.model.GameRules
 import com.nim.game.domain.model.HeapState
+import com.nim.game.domain.model.NimDefaults
 import com.nim.game.domain.model.Player
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import java.util.Random
 
 class OptimalStrategyTest {
     private val strategy = OptimalStrategy()
@@ -37,14 +39,24 @@ class OptimalStrategyTest {
         assertEquals(expectedTake, move.matches)
     }
 
-    @ParameterizedTest(name = "Misere: On losing P-position heap {0} -> defensive fallback take 1")
-    @CsvSource("1", "5", "9", "13")
-    fun `misere mode falls back to the minimum take when already in losing position`(heapSize: Int) {
-        val game = createSingleHeapGame(heapSize, GameMode.MISERE)
+    @Test
+    fun `misere mode with single match is forced to take 1`() {
+        val game = createSingleHeapGame(1, GameMode.MISERE)
 
         val move = strategy.determineMove(game)
 
         assertEquals(1, move.matches)
+    }
+
+    @ParameterizedTest(name = "Misere: On losing P-position heap {0} -> produces valid random move")
+    @CsvSource("5", "9", "13")
+    fun `misere mode executes random fallback when already in losing position`(heapSize: Int) {
+        val seededStrategy = OptimalStrategy(Random(42))
+        val game = createSingleHeapGame(heapSize, GameMode.MISERE)
+
+        val move = seededStrategy.determineMove(game)
+
+        assertTrue(move.matches in GameRules.MIN_TAKE..game.rules.maxTake)
     }
 
     @ParameterizedTest(name = "Normal: Heap {0} -> take {1} to force P-position")
@@ -67,14 +79,15 @@ class OptimalStrategyTest {
         assertEquals(expectedTake, move.matches)
     }
 
-    @ParameterizedTest(name = "Normal: On losing P-position heap {0} -> defensive fallback take 1")
+    @ParameterizedTest(name = "Normal: On losing P-position heap {0} -> produces valid random move")
     @CsvSource("4", "8", "12")
-    fun `normal mode falls back to the minimum take when already in losing position`(heapSize: Int) {
+    fun `normal mode executes random fallback when already in losing position`(heapSize: Int) {
+        val seededStrategy = OptimalStrategy(Random(42))
         val game = createSingleHeapGame(heapSize, GameMode.NORMAL)
 
-        val move = strategy.determineMove(game)
+        val move = seededStrategy.determineMove(game)
 
-        assertEquals(1, move.matches)
+        assertTrue(move.matches in GameRules.MIN_TAKE..game.rules.maxTake)
     }
 
     @Test
@@ -93,13 +106,25 @@ class OptimalStrategyTest {
         assertTrue(exception.message!!.contains("single-heap"))
     }
 
+    @Test
+    fun `solves optimal move for custom maxTake of 4`() {
+        // Modulus = 5. For Misere, losing position is n % 5 == 1 (e.g. 6).
+        // At heap = 8: (8 - 1) % 5 = 2 -> AI takes 2 to leave 6.
+        val game = createSingleHeapGame(matches = 8, mode = GameMode.MISERE, maxTake = 4)
+
+        val move = strategy.determineMove(game)
+
+        assertEquals(2, move.matches)
+    }
+
     private fun createSingleHeapGame(
         matches: Int,
         mode: GameMode,
+        maxTake: Int = NimDefaults.DEFAULT_MAX_TAKE,
     ): Game =
         Game(
             heapState = HeapState.single(matches),
-            rules = GameRules(maxTake = 3, mode = mode),
+            rules = GameRules(maxTake = maxTake, mode = mode),
             currentTurn = Player.COMPUTER,
         )
 }

@@ -92,12 +92,12 @@ The `AiStrategy` fun interface defines the contract for computing automated play
 
 | Strategy | Algorithm | Role in Difficulty resolution |
 | :--- | :--- | :--- |
-| `OptimalStrategy` | Modulo arithmetic against P-positions (single-heap only). Throws `UnsupportedStrategyException` for multi-heap games. | Pure pole (`NIGHTMARE`, probability 1.0) and optimal component of blended difficulties. |
+| `OptimalStrategy` | Modulo arithmetic against P-positions (single-heap only); stochastic fallback in losing P-positions. Multi-heap is guarded by a `check` invariant (`IllegalStateException`) — user-facing rejection is raised upstream by the application layer. | Pure pole (`NIGHTMARE`, probability 1.0) and optimal component of blended difficulties. |
 | `RandomStrategy` | Uniform random selection across legal moves (heap index + take count bounded by rules and physical heap size). | Pure pole (`I_AM_TOO_YOUNG_TO_DIE`, probability 0.0) and random component of blended difficulties. |
 
 ### Error Contract
 
-Strategies may throw `UnsupportedStrategyException` (wrapping a `ConfigurationError`) when the game configuration is outside the strategy's supported scope. This is distinct from `InvalidMoveError` which represents illegal *player* actions.
+Strategies enforce supported-scope invariants via `check(...)` (throwing `IllegalStateException`); the application layer surfaces `UnsupportedStrategyException` (wrapping a `ConfigurationError`) to callers when a configuration falls outside a strategy's supported scope (e.g. multi-heap with optimal play). This is distinct from `InvalidMoveError`, which represents illegal *player* actions.
 
 ---
 
