@@ -34,8 +34,8 @@ ______________________________________________________________________
 
 1. **12-Factor Configuration Hierarchy:**
 
-    - Default game rules (`initialMatches`, `maxTake`, `mode`, `difficulty`, `startingPlayer`) are declared in `NimProperties` via `@ConfigurationProperties(prefix = "nim.default")`.
-   - Explicit request values take precedence; omitted fields seamlessly fall back to configuration defaults.
+    - Default game parameters (`randomHeapMin`, `randomHeapMax`, `maxTake`, `mode`, `difficulty`) are declared in `NimProperties` via `@ConfigurationProperties(prefix = "nim.default")`.
+    - Explicit request values take precedence. Omitted `heaps` and `startingPlayer` are resolved stochastically (random heap size, random opening player); other omitted fields fall back to configuration defaults.
 
 ______________________________________________________________________
 
@@ -78,7 +78,7 @@ The `makeMove` workflow ensures that human actions immediately trigger AI respon
 
 ### Starting Player Resolution
 
-When `createGame` is invoked with `startingPlayer == Player.COMPUTER`, the service immediately computes and applies the opening computer move before persisting the initial state.
+When `startingPlayer` is explicitly set to `COMPUTER` or randomly resolved to `COMPUTER` (when omitted), the service immediately computes and applies the opening computer move before persisting the initial state.
 
 ______________________________________________________________________
 

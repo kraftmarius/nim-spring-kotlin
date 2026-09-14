@@ -6,9 +6,9 @@ package com.nim.game.domain.model
 data class Game(
     val id: GameId = GameId.random(),
     val heapState: HeapState,
+    val currentTurn: Player,
     val rules: GameRules = GameRules(),
-    val difficulty: Difficulty = Difficulty.I_AM_TOO_YOUNG_TO_DIE,
-    val currentTurn: Player = Player.HUMAN,
+    val difficulty: Difficulty = NimDefaults.DEFAULT_DIFFICULTY,
     val status: GameStatus = GameStatus.IN_PROGRESS,
     val winner: Player? = null,
     val history: List<Move> = emptyList(),

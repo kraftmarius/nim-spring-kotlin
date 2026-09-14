@@ -107,6 +107,7 @@ class GameTest {
         val finishedGame =
             Game(
                 heapState = HeapState.single(0),
+                currentTurn = Player.HUMAN,
                 status = GameStatus.FINISHED,
                 winner = Player.COMPUTER,
             )
@@ -159,6 +160,7 @@ class GameTest {
         assertThrows<IllegalArgumentException> {
             Game(
                 heapState = HeapState.single(0),
+                currentTurn = Player.HUMAN,
                 status = GameStatus.FINISHED,
                 winner = null,
             )

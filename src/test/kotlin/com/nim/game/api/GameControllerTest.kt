@@ -40,7 +40,7 @@ class GameControllerTest {
     @Test
     fun `POST games returns 201 with location and state`() {
         val gameId = GameId.random()
-        val game = Game(id = gameId, heapState = HeapState.single(13))
+        val game = Game(id = gameId, heapState = HeapState.single(13), currentTurn = Player.HUMAN)
         `when`(gameService.createGame(CreateGameRequest())).thenReturn(game)
 
         mockMvc
@@ -74,7 +74,7 @@ class GameControllerTest {
     @Test
     fun `GET games by id returns 200 on existing game`() {
         val gameId = GameId.random()
-        val game = Game(id = gameId, heapState = HeapState.single(7))
+        val game = Game(id = gameId, heapState = HeapState.single(7), currentTurn = Player.HUMAN)
         `when`(gameService.getGame(gameId)).thenReturn(game)
 
         mockMvc
@@ -102,6 +102,7 @@ class GameControllerTest {
             Game(
                 id = gameId,
                 heapState = HeapState.single(9),
+                currentTurn = Player.HUMAN,
                 history =
                     listOf(
                         Move(Player.HUMAN, 0, 2),

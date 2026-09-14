@@ -6,36 +6,79 @@ import com.nim.game.domain.model.Player
 import com.nim.game.domain.strategy.UnsupportedStrategyException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.util.Random
 
 class GameServiceTest {
     private lateinit var repository: GameRepository
-    private lateinit var service: GameService
+    private lateinit var properties: NimProperties
 
     @BeforeEach
     fun setUp() {
         repository = GameRepository()
-        service =
-            GameService(
-                repository = repository,
-                strategyResolver = AiStrategyResolver(),
-                properties = NimProperties(),
-            )
+        properties = NimProperties()
     }
 
     @Test
-    fun `createGame with defaults initializes heap and saves to repository`() {
+    fun `createGame with empty request randomizes heap and starting player`() {
+        val service =
+            GameService(
+                repository = repository,
+                strategyResolver = AiStrategyResolver(),
+                properties = properties,
+                random = Random(42),
+            )
+
         val game = service.createGame(CreateGameRequest())
 
-        assertEquals(13, game.heapState.totalMatches())
-        assertEquals(Player.HUMAN, game.currentTurn)
+        // Initial matches before any computer opening move
+        val initialMatches = game.heapState.totalMatches() + game.history.sumOf { it.matches }
+        assertTrue(initialMatches in properties.randomHeapMin..properties.randomHeapMax)
         assertNotNull(repository.findById(game.id))
+
+        // If computer was chosen to start, it must have already executed its move
+        if (game.history.isNotEmpty()) {
+            assertEquals(1, game.history.size)
+            assertEquals(Player.COMPUTER, game.history[0].player)
+            assertEquals(Player.HUMAN, game.currentTurn)
+        }
+    }
+
+    @Test
+    fun `createGame with explicit parameters disables randomization`() {
+        val service =
+            GameService(
+                repository = repository,
+                strategyResolver = AiStrategyResolver(),
+                properties = properties,
+                random = Random(0),
+            )
+
+        val game =
+            service.createGame(
+                CreateGameRequest(
+                    heaps = listOf(7),
+                    startingPlayer = Player.HUMAN,
+                ),
+            )
+
+        assertEquals(listOf(7), game.heapState.heaps)
+        assertEquals(Player.HUMAN, game.currentTurn)
+        assertEquals(0, game.history.size)
     }
 
     @Test
     fun `createGame with computer starting executes opening move immediately`() {
+        val service =
+            GameService(
+                repository = repository,
+                strategyResolver = AiStrategyResolver(),
+                properties = properties,
+            )
+
         val game =
             service.createGame(
                 CreateGameRequest(
@@ -52,6 +95,13 @@ class GameServiceTest {
 
     @Test
     fun `createGame rejects multi-heap with NIGHTMARE immediately`() {
+        val service =
+            GameService(
+                repository = repository,
+                strategyResolver = AiStrategyResolver(),
+                properties = properties,
+            )
+
         val request =
             CreateGameRequest(
                 heaps = listOf(3, 4, 5),
@@ -65,6 +115,13 @@ class GameServiceTest {
 
     @Test
     fun `makeMove executes human move followed by computer counter-move`() {
+        val service =
+            GameService(
+                repository = repository,
+                strategyResolver = AiStrategyResolver(),
+                properties = properties,
+            )
+
         val game =
             service.createGame(
                 CreateGameRequest(
@@ -84,7 +141,20 @@ class GameServiceTest {
 
     @Test
     fun `makeMove throws InvalidMoveException on illegal take`() {
-        val game = service.createGame(CreateGameRequest(heaps = listOf(10)))
+        val service =
+            GameService(
+                repository = repository,
+                strategyResolver = AiStrategyResolver(),
+                properties = properties,
+            )
+
+        val game =
+            service.createGame(
+                CreateGameRequest(
+                    heaps = listOf(10),
+                    startingPlayer = Player.HUMAN,
+                ),
+            )
 
         assertThrows<InvalidMoveException> {
             service.makeMove(game.id, heapIndex = 0, matches = 5)

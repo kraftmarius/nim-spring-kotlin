@@ -12,20 +12,29 @@ import com.nim.game.domain.model.MoveResult
 import com.nim.game.domain.model.Player
 import com.nim.game.domain.strategy.UnsupportedStrategyException
 import org.springframework.stereotype.Service
+import java.util.random.RandomGenerator
 
 @Service
 class GameService(
     private val repository: GameRepository,
     private val strategyResolver: AiStrategyResolver,
     private val properties: NimProperties,
+    private val random: RandomGenerator = RandomGenerator.getDefault(),
 ) {
     fun createGame(request: CreateGameRequest): Game {
-        val resolvedHeaps = request.heaps ?: listOf(properties.initialMatches)
+        val resolvedHeaps =
+            request.heaps
+                ?: listOf(random.nextInt(properties.randomHeapMin, properties.randomHeapMax + 1))
+
+        val resolvedStartingPlayer =
+            request.startingPlayer
+                ?: if (random.nextBoolean()) Player.HUMAN else Player.COMPUTER
+
         val maxTake = request.maxTake ?: properties.maxTake
         val mode = request.mode ?: properties.mode
         val difficulty = request.difficulty ?: properties.difficulty
-        val startingPlayer = request.startingPlayer ?: properties.startingPlayer
 
+        //  Reject unsupported multi-heap configurations immediately
         if (resolvedHeaps.size > 1 && difficulty in setOf(Difficulty.NIGHTMARE, Difficulty.HURT_ME_PLENTY)) {
             throw UnsupportedStrategyException(
                 ConfigurationError.MultiHeapAiNotSupported(difficulty, resolvedHeaps.size),
@@ -35,13 +44,13 @@ class GameService(
         val initialGame =
             Game(
                 heapState = HeapState(resolvedHeaps),
+                currentTurn = resolvedStartingPlayer,
                 rules = GameRules(maxTake = maxTake, mode = mode),
                 difficulty = difficulty,
-                currentTurn = startingPlayer,
             )
 
         val gameToSave =
-            if (startingPlayer == Player.COMPUTER) {
+            if (resolvedStartingPlayer == Player.COMPUTER) {
                 val strategy = strategyResolver.resolve(difficulty)
                 val computerMove = strategy.determineMove(initialGame)
 

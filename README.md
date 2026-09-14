@@ -20,7 +20,7 @@ All endpoints are versioned under `/api/v1` and exchange JSON. All errors follow
 
 | Method | Path | Description |
 | :--- | :--- | :--- |
-| `POST` | `/api/v1/games` | Create a game session. All request fields are optional; omitted values fall back to configuration defaults. |
+| `POST` | `/api/v1/games` | Create a game session. All request fields are optional. Omitted `heaps` and `startingPlayer` are randomized; other omitted fields fall back to configuration defaults. |
 | `GET` | `/api/v1/games/{id}` | Retrieve heap state, current turn, status, and move history for a game. |
 | `POST` | `/api/v1/games/{id}/moves` | Submit a player move; the AI counter-move resolves within the same request. |
 
@@ -65,11 +65,13 @@ Game defaults are externalized under the `nim.default` prefix and overridable vi
 
 | Property | Default | Description |
 | :--- | :--- | :--- |
-| `nim.default.initial-matches` | `13` | Initial heap size when `heaps` is omitted. |
+| `nim.default.random-heap-min` | `10` | Lower bound (inclusive) for the randomized heap size when `heaps` is omitted. |
+| `nim.default.random-heap-max` | `21` | Upper bound (inclusive) for the randomized heap size when `heaps` is omitted. |
 | `nim.default.max-take` | `3` | Maximum matches removable per move. The minimum is fixed at `1`. |
 | `nim.default.mode` | `MISERE` | Win condition: `NORMAL` or `MISERE`. |
 | `nim.default.difficulty` | `I_AM_TOO_YOUNG_TO_DIE` | AI difficulty level. |
-| `nim.default.starting-player` | `HUMAN` | Which player opens the game. |
+
+> **Stochastic defaults:** When `heaps` is omitted, a single heap is initialized with a uniform random size in `[random-heap-min, random-heap-max]`. When `startingPlayer` is omitted, `HUMAN` or `COMPUTER` is selected with equal probability.
 
 ______________________________________________________________________
 

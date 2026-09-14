@@ -2,17 +2,17 @@ package com.nim.game.application
 
 import com.nim.game.domain.model.Difficulty
 import com.nim.game.domain.model.GameMode
-import com.nim.game.domain.model.Player
+import com.nim.game.domain.model.NimDefaults
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 /**
- * Default configurations loaded from environment or application properties.
+ * Global game configuration properties.
  */
 @ConfigurationProperties(prefix = "nim.default")
 data class NimProperties(
-    val initialMatches: Int = 13,
-    val maxTake: Int = 3,
-    val mode: GameMode = GameMode.MISERE,
-    val difficulty: Difficulty = Difficulty.I_AM_TOO_YOUNG_TO_DIE,
-    val startingPlayer: Player = Player.HUMAN,
+    val randomHeapMin: Int = NimDefaults.RANDOM_HEAP_MIN,
+    val randomHeapMax: Int = NimDefaults.RANDOM_HEAP_MAX,
+    val maxTake: Int = NimDefaults.DEFAULT_MAX_TAKE,
+    val mode: GameMode = NimDefaults.DEFAULT_MODE,
+    val difficulty: Difficulty = NimDefaults.DEFAULT_DIFFICULTY,
 )

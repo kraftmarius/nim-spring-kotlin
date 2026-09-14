@@ -7,15 +7,15 @@ package com.nim.game.domain.model
  * remove at least one match per move. Only the maximum take is configurable.
  */
 data class GameRules(
-    val maxTake: Int = 3,
-    val mode: GameMode = GameMode.MISERE,
+    val maxTake: Int = NimDefaults.DEFAULT_MAX_TAKE,
+    val mode: GameMode = NimDefaults.DEFAULT_MODE,
 ) {
     init {
         require(maxTake > MIN_TAKE) { "maxTake ($maxTake) must be greater than $MIN_TAKE" }
     }
 
     companion object {
-        /** Minimum matches removable per move. Fixed by the rules of Nim. */
-        const val MIN_TAKE = 1
+        /** Minimum matches removable per move. Fixed invaraint by the rules of Nim. */
+        const val MIN_TAKE: Int = 1
     }
 }
