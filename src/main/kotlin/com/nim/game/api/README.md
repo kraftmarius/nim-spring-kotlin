@@ -9,7 +9,8 @@ com.nim.game.api
 ├── GameController.kt         # Spring WebMvc REST controller
 ├── GameDtos.kt               # Strongly typed Request/Response models
 ├── GlobalExceptionHandler.kt # RFC 9457 ProblemDetail error mapping
-└── HealthController.kt       # Health check endpoint with game metrics
+├── HealthController.kt       # Health check endpoint with game metrics
+└── OpenApiConfig.kt          # OpenAPI 3.1 spec metadata bean for springdoc
 ```
 
 ______________________________________________________________________
@@ -168,6 +169,17 @@ All exceptions caught by `GlobalExceptionHandler` produce an RFC 9457 `applicati
 
 ______________________________________________________________________
 
+## API Documentation (OpenAPI 3.1 & Scalar)
+
+Springdoc OpenAPI generates a machine-readable specification and an interactive reference from controller annotations:
+
+| Path | Content-Type | Description |
+| :--- | :--- | :--- |
+| `/openapi.json` | `application/json` | OpenAPI 3.1 JSON specification generated from the `OpenApiConfig` bean and controller annotations. |
+| `/docs` | `text/html` | Interactive Scalar reference UI for browsing and testing all endpoints. |
+
+______________________________________________________________________
+
 ## Tactical Component Map
 
 | Component | Responsibility |
@@ -181,3 +193,4 @@ ______________________________________________________________________
 | `HealthResponse` | DTO for the health endpoint: timestamp, active game count, total game count. |
 | `MoveDto` | DTO representing individual player actions. |
 | `GameRulesDto` | DTO representing configured session rules. |
+| `OpenApiConfig` | Spring `@Configuration` exposing the OpenAPI 3.1 metadata bean (title, description, version) consumed by springdoc. |

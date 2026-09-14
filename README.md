@@ -14,6 +14,39 @@ The system implements the subtraction game **Nim** across one or more heaps, wit
 
 ______________________________________________________________________
 
+## How to Play
+
+Two players alternate turns removing **1 to `maxTake`** (default: 3) matches from a single heap. In the default **misère** mode, the player who takes the last match **loses**. In **normal** mode, the player who takes the last match **wins**.
+
+### Example Game (Misère · 1 heap of 7 · maxTake = 3)
+
+| Turn | Player | Move | Heap After |
+| :--- | :--- | :--- | :--- |
+| 1 | `HUMAN` | takes 2 | `[5]` |
+| 2 | `COMPUTER` | takes 3 | `[2]` |
+| 3 | `HUMAN` | takes 1 | `[1]` |
+| 4 | `COMPUTER` | takes 1 | `[0]` |
+
+`COMPUTER` took the last match and **loses** — `HUMAN` wins.
+
+### Quickstart
+
+```bash
+# Create a game — all fields are optional; omitted values use configuration defaults
+curl -s -X POST http://localhost:8080/api/v1/games \
+  -H 'Content-Type: application/json' \
+  -d '{"heaps": [7], "maxTake": 3, "mode": "MISERE", "startingPlayer": "HUMAN"}'
+
+# Make a move — replace {id} with the game ID returned above
+curl -s -X POST http://localhost:8080/api/v1/games/{id}/moves \
+  -H 'Content-Type: application/json' \
+  -d '{"heapIndex": 0, "matches": 2}'
+```
+
+> **Interactive UI:** Prefer a visual interface? Open [the Scalar reference](http://localhost:8080/docs) in a browser — browse every endpoint, inspect request/response schemas, and send live requests without leaving the page.
+
+______________________________________________________________________
+
 ## API Endpoints
 
 All endpoints are versioned under `/api/v1` and exchange JSON. All errors follow RFC 9457 (`application/problem+json`).
@@ -42,7 +75,7 @@ ______________________________________________________________________
 
 - **Kotlin & JVM 25 (LTS):** Chosen for modern language ergonomics (immutability, data classes, null safety) on the LTS runtime.
 - **Spring Boot 4.1.1:** Latest release track, avoiding milestones or unstable snapshots.
-- **Minimal Dependencies:** Core framework starters limited to `org.springframework.boot:spring-boot-starter-webmvc` and `org.springframework.boot:spring-boot-starter-validation`. `kotlin-reflect` and `jackson-module-kotlin` are included for Kotlin serialization support.
+- **Minimal Dependencies:** Core framework starters limited to `org.springframework.boot:spring-boot-starter-webmvc` and `org.springframework.boot:spring-boot-starter-validation`. `kotlin-reflect` and `jackson-module-kotlin` are included for Kotlin serialization support. `springdoc-openapi-starter-webmvc-scalar` provides OpenAPI 3.1 documentation and an interactive Scalar reference UI.
 - **Dev Environment Isolation (NixOS / Flakes):** The project includes a `flake.nix` providing JDK 25, `just`, and `ktlint`. Gradle caches are scoped strictly to `.gradle-home/` to ensure zero pollution of the host environment.
 
 ______________________________________________________________________
@@ -118,7 +151,7 @@ The JUnit 5 test suite spans all three layers:
 
 - **Domain** (`com.nim.game.domain`): `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, `Player` turn alternation, `Difficulty` probability parameterization, and the AI strategy layer (`OptimalStrategy` P-position correctness, `RandomStrategy` legal move bounds).
 - **Application** (`com.nim.game.application`): `GameService` orchestration — game creation, game listing, AI opening move, the human + AI turn cycle, illegal-move rejection, and `AiStrategyResolver` optimal/random blend resolution. `GameRepository` — `totalGames`, `activeGames`, and `findAll` query methods.
-- **API** (`com.nim.game.api`): `GameController` contract via `@WebMvcTest` — status codes, `Location` header, and RFC 9457 error mapping. `GlobalExceptionHandler` — 405 Method Not Allowed and 400 malformed-JSON ProblemDetail responses. `HealthController` — liveness endpoint with repository game metrics.
+- **API** (`com.nim.game.api`): `GameController` contract via `@WebMvcTest` — status codes, `Location` header, and RFC 9457 error mapping. `GlobalExceptionHandler` — 405 Method Not Allowed and 400 malformed-JSON ProblemDetail responses. `HealthController` — liveness endpoint with repository game metrics. `OpenApiTest` — `@SpringBootTest` integration tests for the `/openapi.json` specification and `/docs` Scalar reference.
 
 Gradle is configured to log `PASSED` / `SKIPPED` / `FAILED` events with full exception traces. Run the suite via `just test` (or `just check` for lint + tests).
 
