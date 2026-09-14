@@ -18,7 +18,6 @@ class NimDefaultsTest {
     fun `GameRules default constructor aligns with NimDefaults`() {
         val rules = GameRules()
 
-        assertEquals(GameRules.MIN_TAKE, GameRules.MIN_TAKE)
         assertEquals(NimDefaults.DEFAULT_MAX_TAKE, rules.maxTake)
         assertEquals(NimDefaults.DEFAULT_MODE, rules.mode)
     }

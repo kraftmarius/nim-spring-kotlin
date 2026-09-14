@@ -88,13 +88,12 @@ State validation inside `Game.applyMove(...)` evaluates only **legality** (range
 
 ## Strategy Layer (`strategy/`)
 
-The `AiStrategy` fun interface defines the contract for computing automated player moves. Implementations are pluggable and stateless, enabling composition of difficulty profiles without coupling to specific game configurations.
+The `AiStrategy` fun interface defines the contract for computing automated player moves. Implementations are pluggable and stateless. The application-layer `AiStrategyResolver` composes them into difficulty behavior: every `Difficulty` is a blend of optimal and random play parameterized by `Difficulty.optimalProbability`.
 
-| Strategy | Algorithm | Applicable `Difficulty` |
+| Strategy | Algorithm | Role in Difficulty resolution |
 | :--- | :--- | :--- |
-| `OptimalStrategy` | Modulo arithmetic against P-positions (single-heap only). Throws `UnsupportedStrategyException` for multi-heap games. | `NIGHTMARE` |
-| `RandomStrategy` | Uniform random selection across legal moves (heap index + take count bounded by rules and physical heap size). | `I_AM_TOO_YOUNG_TO_DIE` |
-| `ProbabilisticStrategy` | Composite delegating between a `primary` and `fallback` strategy by a configurable probability threshold. | `HURT_ME_PLENTY` |
+| `OptimalStrategy` | Modulo arithmetic against P-positions (single-heap only). Throws `UnsupportedStrategyException` for multi-heap games. | Pure pole (`NIGHTMARE`, probability 1.0) and optimal component of blended difficulties. |
+| `RandomStrategy` | Uniform random selection across legal moves (heap index + take count bounded by rules and physical heap size). | Pure pole (`I_AM_TOO_YOUNG_TO_DIE`, probability 0.0) and random component of blended difficulties. |
 
 ### Error Contract
 
@@ -112,9 +111,8 @@ Strategies may throw `UnsupportedStrategyException` (wrapping a `ConfigurationEr
 | `Move` | `model` | Value object capturing player action intent. |
 | `Game` | `model` | Aggregate Root orchestrating gameplay and state transitions. |
 | `DomainError` | `model` | Sealed hierarchy of domain and rule violations (`InvalidMoveError`, `ConfigurationError`). |
-| `Difficulty` | `model` | Difficulty level selector (`I_AM_TOO_YOUNG_TO_DIE`, `HURT_ME_PLENTY`, `NIGHTMARE`). |
+| `Difficulty` | `model` | Difficulty level selector. Each member carries `optimalProbability` — the probability the AI plays the optimal move (0.0 = pure random, 1.0 = pure optimal). |
 | `AiStrategy` | `strategy` | Fun interface defining the contract for automated move computation. |
 | `OptimalStrategy` | `strategy` | Mathematically optimal move via P-position targeting (single-heap). |
 | `RandomStrategy` | `strategy` | Uniform random legal move selection. |
-| `ProbabilisticStrategy` | `strategy` | Composite strategy delegating between two strategies by probability. |
 | `UnsupportedStrategyException` | `strategy` | Thrown when a strategy cannot handle the game configuration. |

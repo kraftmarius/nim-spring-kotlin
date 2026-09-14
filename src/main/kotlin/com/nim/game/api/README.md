@@ -51,7 +51,7 @@ Initializes a new game session. All body parameters are optional and fall back t
     "startingPlayer": "HUMAN"
   }
   ```
-  - `heaps`: Optional list of heap sizes. A single-element list (e.g. `[13]`) is the classic Nim setup. Multi-heap lists (e.g. `[3, 4, 5]`) are only supported for `I_AM_TOO_YOUNG_TO_DIE` difficulty; using them with `HURT_ME_PLENTY` or `NIGHTMARE` returns `501 Not Implemented`. When omitted, a single heap is initialized with a uniform random size between `nim.default.random-heap-min` and `nim.default.random-heap-max` (inclusive).
+   - `heaps`: Optional list of heap sizes. Each value must be `>= 1`; non-positive values return `400 Bad Request`. A single-element list (e.g. `[13]`) is the classic Nim setup. Multi-heap lists (e.g. `[3, 4, 5]`) are only supported for `I_AM_TOO_YOUNG_TO_DIE` difficulty; using them with `HURT_ME_PLENTY` or `NIGHTMARE` returns `501 Not Implemented`. When omitted, a single heap is initialized with a uniform random size between `nim.default.random-heap-min` and `nim.default.random-heap-max` (inclusive).
   - `startingPlayer`: Optional. When omitted, `HUMAN` or `COMPUTER` is selected with equal probability.
 - **Response:** `201 Created`
 - **Response Headers:** `Location: /api/v1/games/{id}`

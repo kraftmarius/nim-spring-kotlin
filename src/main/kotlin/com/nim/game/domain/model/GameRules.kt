@@ -15,7 +15,7 @@ data class GameRules(
     }
 
     companion object {
-        /** Minimum matches removable per move. Fixed invaraint by the rules of Nim. */
-        const val MIN_TAKE: Int = 1
+        /** Minimum matches removable per move. Fixed invariant by the rules of Nim. */
+        const val MIN_TAKE = 1
     }
 }

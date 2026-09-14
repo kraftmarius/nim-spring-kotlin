@@ -39,8 +39,12 @@ class GameServiceTest {
         assertTrue(initialMatches in properties.randomHeapMin..properties.randomHeapMax)
         assertNotNull(repository.findById(game.id))
 
-        // If computer was chosen to start, it must have already executed its move
-        if (game.history.isNotEmpty()) {
+        // The starting player is resolved at creation:
+        // - HUMAN starts -> no moves have been applied yet
+        // - COMPUTER starts -> opening move already applied, turn handed back to HUMAN
+        if (game.history.isEmpty()) {
+            assertEquals(Player.HUMAN, game.currentTurn)
+        } else {
             assertEquals(1, game.history.size)
             assertEquals(Player.COMPUTER, game.history[0].player)
             assertEquals(Player.HUMAN, game.currentTurn)
@@ -91,6 +95,26 @@ class GameServiceTest {
         assertEquals(Player.HUMAN, game.currentTurn)
         assertEquals(1, game.history.size)
         assertEquals(Player.COMPUTER, game.history[0].player)
+    }
+
+    @Test
+    fun `createGame rejects zero or negative initial heaps`() {
+        val service =
+            GameService(
+                repository = repository,
+                strategyResolver = AiStrategyResolver(),
+                properties = properties,
+            )
+
+        assertThrows<IllegalArgumentException> {
+            service.createGame(CreateGameRequest(heaps = listOf(0, 5)))
+        }
+        assertThrows<IllegalArgumentException> {
+            service.createGame(CreateGameRequest(heaps = listOf(-1)))
+        }
+
+        // Rejected configurations must not be persisted
+        assertEquals(0, repository.size)
     }
 
     @Test

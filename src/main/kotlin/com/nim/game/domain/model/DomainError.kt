@@ -43,9 +43,9 @@ sealed interface InvalidMoveError : DomainError {
 
 sealed interface ConfigurationError : DomainError {
     data class MultiHeapAiNotSupported(
-        val strategy: Difficulty,
+        val difficulty: Difficulty,
         val heapCount: Int,
     ) : ConfigurationError {
-        override val message: String = "Strategy $strategy is not implemented for $heapCount heaps."
+        override val message: String = "Difficulty $difficulty is not supported for $heapCount heaps."
     }
 }

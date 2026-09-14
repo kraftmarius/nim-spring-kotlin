@@ -29,12 +29,18 @@ enum class GameMode {
 }
 
 /**
- * Available game difficulty levels mapped to AI strategies.
+ * Available game difficulty levels.
+ *
+ * Each difficulty is a point on a single skill axis: [optimalProbability] is the probability
+ * that the AI plays the optimal move on any given turn. 0.0 always plays randomly,
+ * 1.0 always plays optimally.
  */
-enum class Difficulty {
-    I_AM_TOO_YOUNG_TO_DIE,
-    HURT_ME_PLENTY,
-    NIGHTMARE,
+enum class Difficulty(
+    val optimalProbability: Double,
+) {
+    I_AM_TOO_YOUNG_TO_DIE(0.0),
+    HURT_ME_PLENTY(0.5),
+    NIGHTMARE(1.0),
 }
 
 /**

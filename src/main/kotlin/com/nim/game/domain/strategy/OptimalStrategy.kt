@@ -1,7 +1,5 @@
 package com.nim.game.domain.strategy
 
-import com.nim.game.domain.model.ConfigurationError
-import com.nim.game.domain.model.Difficulty
 import com.nim.game.domain.model.Game
 import com.nim.game.domain.model.GameMode
 import com.nim.game.domain.model.GameRules
@@ -16,13 +14,8 @@ class OptimalStrategy : AiStrategy {
         check(!game.isOver()) { "Cannot determine move for a finished game." }
         check(!game.heapState.isEmpty()) { "Cannot determine move when heaps are empty." }
 
-        if (game.heapState.heaps.size > 1) {
-            throw UnsupportedStrategyException(
-                ConfigurationError.MultiHeapAiNotSupported(
-                    strategy = Difficulty.NIGHTMARE,
-                    heapCount = game.heapState.heaps.size,
-                ),
-            )
+        check(game.heapState.heaps.size == 1) {
+            "OptimalStrategy requires single-heap; multi-heap must be rejected upstream"
         }
 
         val heapSize = game.heapState.heaps[0]

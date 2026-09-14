@@ -114,8 +114,8 @@ ______________________________________________________________________
 
 The JUnit 5 test suite spans all three layers:
 
-- **Domain** (`com.nim.game.domain`): `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, `Player` turn alternation, and the AI strategy layer (`OptimalStrategy` P-position correctness, `RandomStrategy` legal move bounds, `ProbabilisticStrategy` delegation distribution).
-- **Application** (`com.nim.game.application`): `GameService` orchestration — game creation, AI opening move, the human + AI turn cycle, and illegal-move rejection.
+- **Domain** (`com.nim.game.domain`): `GameRules` validation, `Game` move resolution and win detection, `HeapState` immutability, `Player` turn alternation, `Difficulty` probability parameterization, and the AI strategy layer (`OptimalStrategy` P-position correctness, `RandomStrategy` legal move bounds).
+- **Application** (`com.nim.game.application`): `GameService` orchestration — game creation, AI opening move, the human + AI turn cycle, illegal-move rejection, and `AiStrategyResolver` optimal/random blend resolution.
 - **API** (`com.nim.game.api`): `GameController` contract via `@WebMvcTest` — status codes, `Location` header, and RFC 9457 error mapping.
 
 Gradle is configured to log `PASSED` / `SKIPPED` / `FAILED` events with full exception traces. Run the suite via `just test` (or `just check` for lint + tests).

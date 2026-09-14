@@ -19,4 +19,8 @@ class GameRepository {
     }
 
     fun findById(id: GameId): Game? = storage[id]
+
+    /** Number of stored games. */
+    val size: Int
+        get() = storage.size
 }

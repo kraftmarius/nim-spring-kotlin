@@ -1,14 +1,12 @@
 package com.nim.game.domain.strategy
 
-import com.nim.game.domain.model.ConfigurationError
-import com.nim.game.domain.model.Difficulty
 import com.nim.game.domain.model.Game
 import com.nim.game.domain.model.GameMode
 import com.nim.game.domain.model.GameRules
 import com.nim.game.domain.model.HeapState
 import com.nim.game.domain.model.Player
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertInstanceOf
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
@@ -80,7 +78,7 @@ class OptimalStrategyTest {
     }
 
     @Test
-    fun `should throw UnsupportedStrategyException on multi-heap game`() {
+    fun `should throw IllegalStateException on multi-heap game`() {
         val multiHeapGame =
             Game(
                 heapState = HeapState(listOf(3, 4)),
@@ -88,13 +86,11 @@ class OptimalStrategyTest {
             )
 
         val exception =
-            assertThrows<UnsupportedStrategyException> {
+            assertThrows<IllegalStateException> {
                 strategy.determineMove(multiHeapGame)
             }
 
-        val error = assertInstanceOf(ConfigurationError.MultiHeapAiNotSupported::class.java, exception.error)
-        assertEquals(Difficulty.NIGHTMARE, error.strategy)
-        assertEquals(2, error.heapCount)
+        assertTrue(exception.message!!.contains("single-heap"))
     }
 
     private fun createSingleHeapGame(

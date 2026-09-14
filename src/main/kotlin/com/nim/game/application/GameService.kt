@@ -2,7 +2,6 @@ package com.nim.game.application
 
 import com.nim.game.api.CreateGameRequest
 import com.nim.game.domain.model.ConfigurationError
-import com.nim.game.domain.model.Difficulty
 import com.nim.game.domain.model.Game
 import com.nim.game.domain.model.GameId
 import com.nim.game.domain.model.GameRules
@@ -34,8 +33,12 @@ class GameService(
         val mode = request.mode ?: properties.mode
         val difficulty = request.difficulty ?: properties.difficulty
 
-        //  Reject unsupported multi-heap configurations immediately
-        if (resolvedHeaps.size > 1 && difficulty in setOf(Difficulty.NIGHTMARE, Difficulty.HURT_ME_PLENTY)) {
+        // Reject degenerate initial configurations: a fresh game cannot contain an empty heap
+        require(resolvedHeaps.all { it > 0 }) { "Initial heaps must be positive: $resolvedHeaps" }
+
+        // Reject unsupported multi-heap configurations immediately:
+        // multi-heap play is unsupported whenever optimal play may occur
+        if (resolvedHeaps.size > 1 && difficulty.optimalProbability > 0.0) {
             throw UnsupportedStrategyException(
                 ConfigurationError.MultiHeapAiNotSupported(difficulty, resolvedHeaps.size),
             )

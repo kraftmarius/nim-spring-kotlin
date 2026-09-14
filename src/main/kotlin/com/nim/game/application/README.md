@@ -84,13 +84,13 @@ ______________________________________________________________________
 
 ## Strategy Resolution (`AiStrategyResolver`)
 
-The resolver maps domain `Difficulty` profiles to concrete `AiStrategy` instances:
+The resolver maps each `Difficulty` to a concrete `AiStrategy` based on a single parameter: `Difficulty.optimalProbability`. Blended difficulties (0.0 < p < 1.0) coin-flip between optimal math and random play per move; the poles short-circuit to the pure strategies, consuming no randomness.
 
-| Difficulty | Resolved Strategy | Behavior |
+| Difficulty | `optimalProbability` | Resolved Behavior |
 | :--- | :--- | :--- |
-| `I_AM_TOO_YOUNG_TO_DIE` | `RandomStrategy` | Uniform stochastic move selection across all non-empty heaps. Multi-heap supported. |
-| `HURT_ME_PLENTY` | `ProbabilisticStrategy` | 50/50 composite delegating between optimal math and random play. Single-heap only; multi-heap requests rejected with `UnsupportedStrategyException`. |
-| `NIGHTMARE` | `OptimalStrategy` | Pure modulo arithmetic against Nim P-positions. Single-heap only; multi-heap requests rejected with `UnsupportedStrategyException`. |
+| `I_AM_TOO_YOUNG_TO_DIE` | `0.0` | Pure `RandomStrategy` — uniform stochastic move selection across all non-empty heaps. Multi-heap supported. |
+| `HURT_ME_PLENTY` | `0.5` | Blend: optimal move with probability 0.5, otherwise random. Single-heap only; multi-heap requests rejected with `UnsupportedStrategyException`. |
+| `NIGHTMARE` | `1.0` | Pure `OptimalStrategy` — deterministic modulo arithmetic against Nim P-positions. Single-heap only; multi-heap requests rejected with `UnsupportedStrategyException`. |
 
 ______________________________________________________________________
 
@@ -100,7 +100,7 @@ ______________________________________________________________________
 | :--- | :--- |
 | `GameService` | Orchestrates game creation, moves, AI turn triggering, and repository updates. |
 | `GameRepository` | In-memory `ConcurrentHashMap` store for active and completed game sessions. |
-| `AiStrategyResolver` | Factory resolving `Difficulty` enums into stateless `AiStrategy` instances. |
+| `AiStrategyResolver` | Resolves `Difficulty` enums into `AiStrategy` instances: pure strategies at the probability poles, an optimal/random blend in between. |
 | `NimProperties` | `@ConfigurationProperties` data class holding default game settings. |
 | `GameNotFoundException` | Thrown when an operation targets a non-existent `GameId`. |
 | `InvalidMoveException` | Wraps domain `InvalidMoveError` into an application-level exception. |
